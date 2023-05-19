@@ -1,0 +1,102 @@
+var clicks = 0;
+var clicker = 0;
+var clickerPrice = 10;
+var grandma = 0;
+var grandmaPrice = 100;
+var farm = 0;
+var farmPrice = 1000;
+//List of alerts
+var alerts = ["check Upgrades", "check Multipliers", "Get More Cookies", "click faster", "almost there"];
+onEvent("cookie", "click", function( ) {
+  clicks = clicks + 1;
+  setText("NumCookie", "cookies: " + clicks);
+});
+onEvent("clickerUpgrade1", "click", function( ) {
+  if (clicks>=5000) {
+    clicks = clicks-5000;
+    clicker=clicker+1;
+    setText("NumCookie", "cookies: " + clicks);
+    hideElement("clickerUpgrade1");
+  }
+});
+function clickerGen(c) {
+  if (clicks>=clickerPrice) {
+   c=clicker;
+   c=c+1;
+   onEvent("clickerUpgrade1", "click", function( ) {
+     if (clicks>=5000) {
+       clicks = clicks-5000;
+       c=c*2;
+       setText("NumCookie", "cookies: " + clicks);
+       hideElement("clickerUpgrade1");
+     }
+   });
+   clicks=clicks-clickerPrice;
+   clickerPrice = Math.round(clickerPrice*1.4);
+   setText("NumCookie", "cookies: " + clicks);
+  }
+  setInterval(function() {
+    clicks = clicks + c*1;
+    setText("NumCookie", "cookies: " + clicks);
+  }, 2000);
+}
+onEvent("buyClicker", "click", function( ) {
+  clickerGen(0);
+  setText("clickerLab", "Clicker: " + clickerPrice);
+});
+function grandmaGen(g) {
+  if (clicks>=grandmaPrice) {
+   g=grandma;
+   g=g+1;
+   clicks=clicks-grandmaPrice;
+   grandmaPrice = Math.round(grandmaPrice*1.4);
+   setText("NumCookie", "cookies: " + clicks);
+  } else {
+    playSound("sound://category_alerts/playful_game_error_sound_4.mp3", false);
+  }
+  setInterval(function() {
+    clicks = clicks + g*10;
+    setText("NumCookie", "cookies: " + clicks);
+  }, 2000);
+}
+onEvent("buyGrandma", "click", function( ) {
+  grandmaGen(0);
+  setText("grandmaLab", "Grandma: " + grandmaPrice);
+});
+function farmGen(f) {
+  if (clicks>=farmPrice) {
+   f=farm;
+   f=f+1;
+   clicks=clicks-farmPrice;
+   farmPrice = Math.round(farmPrice*1.4);
+  }
+  setInterval(function() {
+    clicks = clicks + f*100;
+    setText("NumCookie", "cookies: " + clicks);
+  }, 2000);
+}
+onEvent("buyFarm", "click", function( ) {
+  farmGen(0);
+  setText("farmLab", "Farm: " + farmPrice);
+});
+onEvent("upgButton", "click", function( ) {
+  setScreen("UpgradeScreen");
+});
+onEvent("backButton", "click", function( ) {
+  setScreen("home");
+});
+onEvent("multiButton", "click", function( ) {
+  setScreen("multScreen");
+});
+onEvent("multiBack", "click", function( ) {
+  setScreen("home");
+});
+onEvent("cookie", "click", function( ) {
+  if (clicks >= 5000) {
+    setText("A", alerts[1]);
+  } else if ((clicks >= (clickerPrice || (grandmaPrice || farmPrice)))) {
+    setText("A", alerts[0]);
+  } else {
+    setText("A", alerts[(randomNumber(2, 4))]);
+  }
+});
